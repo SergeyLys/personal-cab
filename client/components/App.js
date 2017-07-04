@@ -1,5 +1,8 @@
 import React from 'react';
 import './App.scss';
+import Navigation from './Navigation';
+import { routes } from '../routes';
+import {Router, hashHistory} from 'react-router';
 
 export default class App extends React.Component {
 
@@ -8,10 +11,12 @@ export default class App extends React.Component {
     }
 
     render() {
+        console.log(this.props);
         return (
             <div className="container">
-                App
+                <Router history={hashHistory} routes={routes} />
             </div>
         );
     }
 }
+
