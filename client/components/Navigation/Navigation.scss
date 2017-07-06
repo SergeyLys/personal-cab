@@ -1,0 +1,32 @@
+.site-navigation {
+  background-color: #fff;
+  border: 1px solid #cddeea;
+  border-radius: 10px;
+  overflow: hidden;
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  a {
+    display: block;
+    color: #122c6f;
+    transition: all .3s ease;
+    padding: 5px;
+    border-bottom: 1px solid #cddeea;
+
+    &.active,
+    &:hover {
+      color: #fff;
+      background-color: #4969ba;
+    }
+  }
+
+  li:last-child {
+    a {
+      border-bottom: none;
+    }
+  }
+}

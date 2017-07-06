@@ -1,7 +1,7 @@
 /*Диспансеризация*/
 
 import React from 'react';
-import Navigation from './Navigation';
+import Navigation from './Navigation/Navigation';
 
 export default class Dispans extends React.Component {
 

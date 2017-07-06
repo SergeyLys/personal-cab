@@ -1,7 +1,7 @@
 /*Оказанные услуги*/
 
 import React from 'react';
-import Navigation from './Navigation';
+import Navigation from './Navigation/Navigation';
 
 export default class Services extends React.Component {
 
