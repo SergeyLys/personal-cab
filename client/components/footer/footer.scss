@@ -1,4 +1,22 @@
 .site-footer {
+
+}
+
+.footer-bottom-row {
   background-color: #122c6f;
   color: #fff;
+}
+
+.footer-bottom-content {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 0;
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: #fff;
+  }
 }

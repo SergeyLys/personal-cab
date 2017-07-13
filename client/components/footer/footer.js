@@ -9,7 +9,16 @@ export default class Footer extends React.Component {
     render() {
         return (
             <footer className="site-footer">
-                <p>footer</p>
+                <div className="footer-bottom-row">
+                    <div className="row">
+                        <div className="small-12 columns">
+                            <div className="footer-bottom-content">
+                                <p>&#169; 2016, ВТБ Медицинское страхование. <a href="#" className="desctop-visible">Правовая информация</a></p>
+                                <p><a href="#">Группа ВТБ</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </footer>
         )
     }

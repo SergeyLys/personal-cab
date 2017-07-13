@@ -1,0 +1,1423 @@
+swagger: "2.0"
+info:
+  version: 0.0.1
+  title: ВТБ Страхование
+  description: Описание API для клиента ВТБ Страхование
+  contact:
+    name: ООО "Амедико"
+    url: http://amediko.ru
+    email: info@amediko.ru
+schemes:
+  - https
+produces:
+  - application/json
+consumes:
+  - application/json
+paths:
+  /affiliates:
+    get:
+      tags:
+        - affiliates
+      summary: Список офисов
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              results:
+                type: array
+                items:
+                    $ref: '#/definitions/Affiliate'
+                minItems: 0
+        '500':
+          description: Ошибка сервера
+  /auth/esia:
+    get:
+      tags:
+        - auth
+        - esia
+        - user
+      summary: Вход через Госуслуги
+      parameters:
+        - in: query
+          name: state
+          description: Идентификатор клиента
+          type: string
+          format: uuid
+          required: true
+      responses:
+        '200':
+          description: Выдача ссылки на авторизацию через Госуслуги
+          schema:
+            type: object
+            properties:
+              auth_url:
+                type: string
+                description: Ссылка на авторизацию через Госуслуги
+            required:
+              - auth_url
+        '422':
+          description: |
+            * __422__ Не указан параметр state или state не является uuid
+  /auth/esia/complete:
+    get:
+      tags:
+        - auth
+        - esia
+        - callback
+      summary: Обратный вызов со стороны Госуслуг
+      parameters:
+        - in: query
+          name: code
+          type: string
+          required: true
+        - in: query
+          name: state
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Успешная авторизация
+          schema:
+            $ref: '#/definitions/Auth_EsiaLoginOutput'
+        '422':
+          description: |
+            * __422__ Неверный запрос со стороны ЕСИА. Не переданы все необходимые параметры
+            * __1000__ Пользователь не найден
+            * __1020__ Пользователь ЛКК не может быть однозначно сопоставлен (возникает в случае если не
+              представляется возможным сопоставить пользователя Госуслуг с учетной записью ЛКК.
+            * __1150__ Не удалось авторизовать пользователя. В случае подобной ошибки можно предложить пользователю пройти авторизацию чуть позже.
+        '500':
+          description: Ошибка сервера
+  /auth/login:
+    post:
+      tags:
+        - auth
+        - user
+      summary: Вход в ЛКК
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Auth_Login'
+      responses:
+        '200':
+          description: |
+            * В случае успешной авторизации на выходе будет токен авторизации
+              и признак первого входа в ЛКК.
+            * В случае двухфакторной авторизации будет флаг о необходимости ввести
+              одноразовый проверочный код.
+          schema:
+            $ref: '#/definitions/Auth_LoginOutput'
+        '400':
+          description: Неверные входные данные в JSON
+        '422':
+          description: |
+            * __1100__ Неверный адрес электронной почты или телефон
+            * __1000__ Пользователь не найден
+            * __422__ Проверочный код не требуется
+            * __1320__ Проверочный код неверный или просрочен (в случае двухфакторной авторизации)
+            * __1170__ Пользователь не активирован
+            * __600__ Превышено количество попыток входа в ЛКК
+            * __601__ Пользователь временно заблокирован из-за превышения попыток входа
+            * __1140__ Неверный пароль
+            * __1150__ Не удалось авторизовать пользователя. В случае подобной ошибки можно
+              предложить пользователю пройти авторизацию чуть позже.
+        '500':
+          description: Ошибка сервера
+  /auth/logout:
+    get:
+      tags:
+        - auth
+        - user
+      summary: Завершение пользовательской сессии
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Сессия успешно завершена
+        '401':
+          description: Пользовательская сессия не найдена
+        '500':
+          description: Ошибка сервера
+  /auth/registration:
+    post:
+      tags:
+        - auth
+        - user
+      summary: Регистрация нового пользователя ЛКК
+      description: |
+        Регистрация нового пользователя по номеру телефона или адресу электронной почты.
+        При повторном запросе обновляется код активации и высылается на указанный контакт.
+        **TODO: для 422 указать коды**
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Auth_Registration'
+      responses:
+        '200':
+          description: |
+            Пользователю отправляется новый код активации.
+        '201':
+          description: |
+            Новая учетная запись создана. Сгенерированный код активации отправляется
+            на указанный контакт.
+        '400':
+          description: Неверные входные данные в JSON
+        '422':
+          description: |
+            * __1100__ Неверный адрес электронной почты или телефон
+            * __1110__ Необходимо подтвердить согласие с условиями использования
+            * __1010__ Пользователь с таким именем уже существует
+        '500':
+          description: Ошибка сервера
+  /auth/registration/complete:
+    post:
+      tags:
+        - auth
+        - user
+      summary: Завершающий шаг регистрации нового пользователя ЛКК и вход в систему
+      description: |
+        Завершение регистрации нового пользователя ЛКК. На этом этапе пользователь
+        подтверждает контакт вводом полученного кода активации, устанавливает пароль
+        и делает первичное заполнение данных профиля.
+
+        При удачном завершении этого шага, пользователь активируется и стартует
+        сессия.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Auth_RegistrationComplete'
+      responses:
+        '200':
+          description: |
+            Регистрация завершена, пользователь активирован и аутентифицирован.
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                description: Токен авторизации
+            required:
+              - token
+        '400':
+          description: Неверные входные данные в JSON
+        '422':
+          description: |
+            * __1100__ Неверный адрес электронной почты или телефон
+            * __1000__ Пользователь не найден
+            * __1120__ Пользователь уже активирован
+            * __1130__ Код активации неверный или просрочен
+            * __1310__ Пароли не совпадают
+            * __1150__ Пользователь активирован, но не удалось автоматически его авторизовать.
+              В случае подобной ошибки можно предложить пользователю пройти авторизацию
+              в ручном режиме.
+        '500':
+          description: Ошибка сервера
+  /auth/restore:
+    post:
+      tags:
+        - auth
+        - user
+      summary: Восстановление доступа к ЛКК
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Auth_Restore'
+      responses:
+        '200':
+          description: |
+            * Отправлен код
+            * В случае если новый пароль установлен, выдается токен авторизации
+          schema:
+            $ref: '#/definitions/Auth_LoginOutput'
+        '422':
+          description: |
+            *
+        '500':
+          description: Ошибка сервера
+  /common:
+    get:
+      tags:
+        - user
+        - common
+      summary: Общая информация для ЛКК авторизованных клиентов
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/LKK_CommonOutput'
+        '401':
+          description: Доступ закрыт
+        '500':
+          description: Ошибка сервера
+  /contracts:
+    get:
+      tags:
+        - contracts
+      summary: Список договоров/полисов
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              results:
+                type: array
+                items:
+                    $ref: '#/definitions/Contract'
+                minItems: 0
+        '500':
+          description: Ошибка сервера
+  /dashboard:
+    get:
+      tags:
+        - user
+      summary: Информация для главной страницы ЛКК
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/LKK_DashboardOutput'
+        '401':
+          description: Доступ закрыт
+        '500':
+          description: Ошибка сервера
+  /news:
+    get:
+      tags:
+        - news
+      summary: Список новостей
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+        - in: query
+          name: limit
+          type: integer
+          minimum: 1
+          default: 10
+        - in: query
+          name: offset
+          type: integer
+          minimum: 0
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              results:
+                type: array
+                items:
+                    $ref: '#/definitions/NewsArticle'
+                minItems: 0
+        '500':
+          description: Ошибка сервера
+  /profile:
+    get:
+      tags:
+        - profile
+      summary: Получение учетных данных пользователя
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Объект с учетными данными пользователя
+          schema:
+            $ref: '#/definitions/Profile_ProfileOutput'
+        '401':
+          description: Доступ запрещён
+        '500':
+          description: Ошибка сервера
+    put:
+      tags:
+        - profile
+      summary: Сохранение учетных данных пользователя
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Учетные данные сохранены
+        '500':
+          description: Ошибка сервера
+  /profile/document:
+    post:
+      tags:
+        - profile
+      summary: Добавление нового документа
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+      responses:
+        '201':
+          description: Документ добавлен
+        '401':
+          description: Доступ запрещён
+        '500':
+          description: Ошибка сервера
+  /profile/document/{document_id}:
+    delete:
+      tags:
+        - profile
+      summary: Удаление документа
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+        - in: path
+          name: document_id
+          type: string
+          format: uuid
+          required: true
+      responses:
+        '204':
+          description: Документ удалён
+        '401':
+          description: Доступ запрещён
+        '404':
+          description: Документ не найден
+        '500':
+          description: Ошибка сервера
+  /profile/manage_contact:
+    post:
+      tags:
+        - profile
+      summary: Добавление контактных данных
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Profile_ManageContact'
+      responses:
+        '200':
+          description: Контакт проверен и помечен как подтверждённый
+        '201':
+          description: Новый контакт добавлен, на него выслан проверочный код
+        '401':
+          description: Доступ запрещён
+        '422':
+          description: |
+            * Контакт ошибочный (должен быть либо телефон, либо адрес электронной почты)
+            * Код подтверждения неверный или недействительный
+            * Такой контакт уже зарегистрирован в системе
+            * Контакт уже добавлен
+            * Контакт уже подтвержденный
+        '500':
+          description: Ошибка сервера
+  /profile/change/password:
+    post:
+      tags:
+        - profile
+      summary: Смена пароля
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Profile_ChangePassword'
+      responses:
+        '200':
+          description: Пароль изменен
+        '401':
+          description: Доступ запрещён
+        '422':
+          description: |
+            * Неверный пароль
+            * Новый пароль совпадает со старым
+            * Новые пароли не совпадают
+        '500':
+          description: Ошибка сервера
+  /profile/settings:
+    get:
+      tags:
+        - profile
+      summary: Получение настроек пользователя
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Объект с параметрами
+          schema:
+            $ref: '#/definitions/Profile_GetSettings'
+    put:
+      tags:
+        - profile
+      summary: Сохранение настроек пользователя
+      parameters:
+        - in: header
+          name: X-Auth-Token
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Параметры сохранены
+        '500':
+          description: Ошибка сервера
+definitions:
+  Affiliate:
+    description: Филиал
+    type: object
+    properties:
+      title:
+        type: string
+        description: Название филиала, может так же содержать в себе указание на вид деятельности, используемый для фильтра (напр. "ипотечное страхование")
+      city:
+        type: string
+      pub_date:
+        type: string
+        format: date
+      address:
+        type: string
+      oper_mode:
+        type: string
+        description: Режим работы
+      phone:
+        type: string
+      is_filial:
+        type: boolean
+  Auth_Login:
+    description: Аутентификация пользователя
+    type: object
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+        format: password
+      code:
+        type: integer
+        description: Одноразовый код
+    required:
+      - username
+      - password
+  Auth_LoginOutput:
+    description: Объект возвращаемый при аутентификации
+    type: object
+    properties:
+      token:
+        type: string
+        description: Токен авторизации
+      is_first:
+        type: boolean
+        description: Флаг информирующий о том что пользователь впервые вошел в ЛКК
+      identity_confirmed:
+        type: boolean
+        description: Флаг информирующий о том что пользователь прошел усиленную авторизацию
+      two_factor:
+        type: boolean
+        description: |
+          Флаг показывающий необходимость прохождения дополнительного шага при
+          аутентификации с вводом кода
+  Auth_EsiaLoginOutput:
+    description: Объект возвращаемый при аутентификации через Госуслуги
+    type: object
+    properties:
+      token:
+        type: string
+        description: Токен авторизации
+      is_first:
+        type: boolean
+        description: Флаг информирующий о том что пользователь впервые вошел в ЛКК
+      identity_confirmed:
+        type: boolean
+        description: Флаг информирующий о том что пользователь прошел усиленную авторизацию
+  Auth_Registration:
+    description: Первый шаг регистрации нового пользователя
+    type: object
+    properties:
+      username:
+        type: string
+        description: Мобильный телефон или электронная почта
+      accept_terms_of_use:
+        type: boolean
+        description: Согласие с условиями использования личного кабинета ВТБ Страхование. Обязателен на первом шаге регистрации.
+        enum:
+          - true
+      lkk_medins:
+        type: boolean
+        description: Согласие с автоматическим созданием дополнительного личного кабинета ВТБ Медицинское страхование (Первый шаг)
+      lkk_lifeins:
+        type: boolean
+        description: Согласие с автоматическим созданием дополнительного личного кабинета ВТБ Страхование жизни (Первый шаг)
+      subscribe:
+        type: boolean
+        description: Согласие на периодическое получение рассылки материалов информационного характера (Первый шаг)
+    required:
+      - username
+      - accept_terms_of_use
+  Auth_RegistrationComplete:
+    description: Второй завершающий шаг регистрации нового пользователя
+    type: object
+    properties:
+      username:
+        type: string
+        description: Мобильный телефон или электронная почта
+      code:
+        type: integer
+        description: Одноразовый код активации
+      password:
+        type: string
+        description: Новый пароль
+      password_again:
+        type: string
+        description: Повторный ввод пароля
+      surname:
+        type: string
+        description: Фамилия
+      firstname:
+        type: string
+        description: Имя
+      middlename:
+        type: string
+        description: Отчество
+      birthdate:
+        type: string
+        description: Дата рождения
+        format: date
+    required:
+      - username
+      - code
+      - password
+      - password_again
+      - surname
+      - firstname
+      - birthdate
+  Auth_Restore:
+    type: object
+    properties:
+      username:
+        type: string
+        description: Номер телефона или адрес электронной почты
+      code:
+        type: integer
+        description: Проверочный код
+      new_password:
+        type: string
+        description: Новый пароль
+      new_password_again:
+        type: string
+        description: Повтор нового пароля
+    required:
+      - username
+  Claim:
+    type: object
+    description: Страховой случай (убыток в терминологии п. 3.1.1.4.1 ТЗ)
+    properties:
+      number:
+        type: string
+        description: Дата введения события
+      event_date:
+        type: string
+        format: date
+        description: Дата введения события
+      status_change_date:
+        type: string
+        format: date
+        description: Дата изменения статуса
+      status_history:
+        type: array
+        description: История изменения статуса убытка
+        items:
+          type: object
+          properties:
+            date:
+              type:  string
+              format: date
+              description: Дата смены статуса
+            info:
+              type:  string
+              description: Описание
+          minItems: 0
+  Contract:
+    description: Стандартное описание договора
+    type: object
+    properties:
+      contract_title:
+          type: string
+          description: Название договора
+      contract_type:
+        type: string
+        description: Тип договора
+        enum:
+          - kasko
+          - prop
+          - ipoteka
+          - accident
+          - vzr
+          - dms
+      is_active:
+          type: boolean
+          description: Флаг активности договора
+      series:
+        type: string
+        description: Серия полиса (договора страхования)
+      number:
+        type: string
+        description: Номер полиса (договора страхования)
+      sign_date:
+        type: string
+        format: date
+        description: Дата подписания договора страхования
+      insurance_period:
+        type: object
+        description: Период страхования
+        properties:
+          from_date:
+            type: string
+            format: date
+            description: Дата начала
+          to_date:
+            type: string
+            format: date
+            description: Дата окончания
+      insurer:
+        $ref: '#/definitions/Person'
+      insurance_prem:
+        type: number
+        format: float
+        description: Страховая премия (сумма в рублях)
+      payment_info:
+        type: object
+        properties:
+          status:
+            type: string
+            description: Статус оплаты (не оплачен, частично, полностью)
+            enum:
+              - notpaid
+              - partially
+              - paid
+          actually:
+            type: number
+            format: float
+            description: Фактически выплаченная сумма
+          total_remained:
+            type: number
+            format: float
+            description: Сумма, которую осталось оплатить
+      claims:
+        type: array
+        description: Страховые случаи
+        items:
+          $ref: '#/definitions/Claim'
+        minItems: 0
+      documents:
+        type: array
+        description: Документы
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Название файла
+            link:
+              type: string
+              description: ссылка для скачивания
+            size:
+              type: string
+              description: Размер файла, Мб
+            upload_date:
+              type: string
+              format: date-time
+              description: Дата загрузки
+        minItems: 0
+      user_comment:
+        type: string
+        description: поле для заметок пользователя
+      type_info:
+      # TODO: required
+        type: object
+        description: Специфичная для типа полиса информация
+        enum:
+          # TODO: поменять определение на актуальное для типов договоров
+          - $ref: '#/definitions/ContractKaskoInfo'
+          - $ref: '#/definitions/ContractPropInfo'
+          - $ref: '#/definitions/ContractIpotekaInfo'
+          - $ref: '#/definitions/ContractAccidentInfo'
+          - $ref: '#/definitions/ContractVzrInfo'
+          - $ref: '#/definitions/ContractDmsInfo'
+  ContractAccidentInfo:
+    type: object
+    description: Дополнительные данные для договора страхования от несчастных случаев и болезней
+    properties:
+      insured_persons_info:
+        type: array
+        description: Застрахованные лица и покрытия по каждому из них
+        items:
+          type: object
+          properties:
+            person:
+              $ref: '#/definitions/Person'
+            insurance_coverages:
+              type: array
+              items:
+                type: object
+                description: Покрытие для персоны
+                properties:
+                  cover_type:
+                    type: string
+                    description: Вид покрытия
+                  insurance_sum:
+                    type: number
+                    format: float
+                    description: Страховая сумма
+                  validity_period:
+                    type: object
+                    description: Срок действия договора по каждому виду покрытия
+                    properties:
+                      date_from:
+                        type:  string
+                        format: date
+                        description: Дата начала
+                      date_to:
+                        type:  string
+                        format: date
+                        description: Дата окончания
+                  waiting_period:
+                    type: integer
+                    description: Период ожидания (если есть)
+                # TODO: изменить значение
+                # minItems: 1
+                minItems: 0
+          # TODO: изменить значение
+          # minItems: 1
+          minItems: 0
+  ContractDmsInfo:
+    type: object
+    description: Дополнительные данные для договора ДМС
+    properties:
+      franchise_percent:
+        type: number
+        format: float
+        description: Франшиза в процентах
+      # TODO:
+      special_action_info:
+        type: string
+        description: Не реализовано. Информация в этом блоке будет определять наличие/отсутствие и содержание блока о бесплатном приобретении полиса ВЗР (или других акциях, настраиваемых через админку)
+      curator_medic:
+        type: object
+        description: Данные по врачу-куратору
+        properties:
+          person:
+            $ref: '#/definitions/Person'
+          photo_url:
+            type:  string
+            description: URL фоторграфии
+      insured_persons:
+        type: array
+        description: Застрахованные персоны
+        items:
+          type: object
+          properties:
+            person:
+              $ref: '#/definitions/Person'
+          # TODO: изменить значение
+          # minItems: 1
+          minItems: 0
+      derived_services:
+        type: array
+        description: Оказанные услуги
+        items:
+          type: object
+          properties:
+            title:
+              type:  string
+              description: Наименование услуги
+            end_date:
+              type:  string
+              format: date
+              description: Дата оказания услуги (в dms-1.0.xsd есть begin_date и end_date, берём дату окончания)
+            paid_amount:
+              type: number
+              format: float
+              description: оплаченная сумма
+            organization:
+              type:  string
+              description: ЛПУ, оказавшее услугу
+          minItems: 0
+      lpu_list:
+        type: array
+        description: Список ЛПУ
+        items:
+          type: object
+          properties:
+            city:
+              type:  string
+              description: Город
+            metro_station:
+              type:  string
+              description: Станция метро (если есть)
+            title:
+              type:  string
+              description: Название организации
+            adress:
+              type:  string
+              description: Адрес
+            phones:
+              type: array
+              description: Телефоны
+              items:
+                type:  string
+                minItems: 0
+      partner_info:
+        type: string
+        description: Блок информации о партнёре для коробочного полиса ДМС
+      messages_list:
+        type: array
+        description: Переписка с врачом-куратором
+        items:
+          type: object
+          properties:
+            message:
+              $ref: '#/definitions/Message'
+          minItems: 0
+  # TODO:
+  # карточка договора для коробочного полиса ДМС (доработать partner_info)
+  ContractIpotekaInfo:
+    type: object
+    description: Дополнительные данные для договора ипотечного страхования
+    properties:
+      insured_object_adress:
+        type: string
+        description: Адрес объекта
+      insurance_title_status:
+        type: boolean
+        description: Статус страхования титула - Да/Нет
+      insured_persons:
+        type: array
+        description: Застрахованные лица
+        items:
+          $ref: '#/definitions/Person'
+        # TODO: изменить значение?
+        # minItems: 1
+        minItems: 0
+  ContractKaskoInfo:
+    type: object
+    description: Дополнительные данные для договора КАСКО
+    properties:
+      franchise_sum:
+        type: number
+        format: float
+        description: Франшиза - сумма в рублях
+      auto:
+        type: object
+        description: Сведения о ТС
+        properties:
+          car_brand:
+            type: string
+            description: Марка, модель
+          year:
+            type: integer
+            format: int32
+            description: год выпуска
+          gosnomer:
+            type: string
+            description: Госномер
+      insured_risks:
+        type: array
+        description: Застрахованные риски (поступает из справочника застр. рисков по группе "Авто", см ЧТЗ)
+        items:
+          type: object
+          properties:
+            lkk_title:
+              type: string
+              description: Название застрахованного риска в ЛКК
+        # TODO: изменить значение
+        # minItems: 1
+        minItems: 0
+      drivers_info:
+        type: array
+        description: Допущенные к управлению водители
+        items:
+          type: object
+          properties:
+            short_name:
+              type:  string
+              description: Фамилия, инициалы
+            born_date:
+              type:  string
+              format: date
+              description: Дата рождения
+          # TODO: изменить значение
+          # minItems: 1
+          minItems: 0
+      special_conditions:
+        type: string
+        description: Особые условия - текст из справочника программ КАСКО (ЧТЗ 3.10.5), если поле пустое, то и в ЛКК его нет
+  ContractPropInfo:
+    type: object
+    description: Дополнительные данные для договора страхования имущества
+    properties:
+      name_of_property:
+        type: string
+        description: Наименование застрахованного имущества
+  ContractVzrInfo:
+    type: object
+    description: Дополнительные данные для договора страхования выезжающих за границу
+    properties:
+      insurance_program:
+        type: string
+        description: Программа страхования
+      insurance_territory:
+        type: string
+        description: Территория страхования
+      number_of_days:
+        type: number
+        format: int
+        description: Количество дней (в течение которых действует полис)
+      additional_conditions:
+        type: string
+        description: Дополнительные условия
+      insured_persons:
+        type: array
+        description: Застрахованные персоны
+        items:
+          type: object
+          properties:
+            person:
+              $ref: '#/definitions/Person'
+            document_number:
+              type:  string
+              description: Номер документа
+          # TODO: изменить значение
+          # minItems: 1
+          minItems: 0
+      insurance_coverages:
+        type: array
+        description: Описание покрытия
+        items:
+          type: object
+          description: Покрытие для персоны
+          properties:
+            cover_type:
+              type: string
+              description: Описание услуг
+            franchise_flag:
+              type: boolean
+              description: Франшиза - да/нет
+            insurance_sum:
+              type: number
+              format: float
+              description: Страховая сумма
+            insurance_prem:
+              type: number
+              format: float
+              description: Страховая премия - показывается только страхователю
+            currency:
+              type: string
+              description: Код валюты, в которой проведен расчет варианта
+            service_company:
+              type: object
+              description: Сервисная компания
+              properties:
+                title:
+                  type:  string
+                  description: Название
+                additional_info:
+                  type:  string
+                  description: Информация о сервисной компании
+          # TODO: изменить значение
+          # minItems: 1
+          minItems: 0
+  LKK_DashboardOutput:
+    type: object
+    properties:
+      policies:
+        type: object
+        properties:
+          total:
+            type: integer
+            minimum: 0
+            description: Общее количество договоров
+          require_attention:
+            description: Список договоров, по которым есть новые оповещения
+            type: array
+            items:
+              $ref: '#/definitions/LKK_PolicyAttentionShortInfo'
+            minItems: 0
+      inquiries:
+        type: object
+        description: Обращения
+        properties:
+          total:
+            type: integer
+            minimum: 0
+            description: Общее количество обращений
+          new:
+            type: array
+            description: Список обращений с непросмотренными сообщениями
+            items:
+              $ref: '#/definitions/LKK_InquiryShortInfo'
+            minItems: 0
+      news:
+        type: array
+        description: Список новостей
+        items:
+          $ref: '#/definitions/NewsArticle'
+        minItems: 0
+  LKK_InquiryShortInfo:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Идентификатор обращения
+      text:
+        type: string
+        description: Текст первого сообщения пользователя в "ветке" обращений
+      date:
+        type: string
+        format: date-time
+        description: Дата время последнего на данный момент сообщения
+      author:
+        type: string
+        description: Автор последнего на данный момент сообщения
+      comment:
+        type: string
+        description: Текст последнего на данный момент сообщения
+    required:
+      - id
+  LKK_PolicyAttentionShortInfo:
+    type: object
+    properties:
+      number:
+        type: string
+        description: Номер договора/полиса
+      title:
+        type: string
+        description: Название
+      comment:
+        type: string
+        description: Комментарий пользователя к данному договору
+      notification:
+        type: string
+        description: Текст уведомления по страховому случаю
+      amount:
+        type: number
+        format: float
+        description: Сумма платежа
+      expiration_date:
+        type: string
+        format: date
+        description: Срока истечения договора
+  LKK_CommonOutput:
+    type: object
+    properties:
+      user:
+        type: object
+        properties:
+          firstname:
+            type: string
+          middlename:
+            type: string
+          surname:
+            type: string
+      vip:
+        type: object
+        properties:
+          manager:
+            type: object
+            description: Информация о персональном менеджере
+            properties:
+              fullname:
+                type: string
+                description: ФИО персонального менеджера
+              photo:
+                type: string
+                description: Ссылка на фотографию менеджера
+              phone:
+                type: string
+                description: Телефон персонального менеджера
+          medical_curator:
+            type: object
+            description: Информация о враче-кураторе (при наличии договора ДМС)
+            properties:
+              fullname:
+                type: string
+                description: ФИО врача-куратора
+              photo:
+                type: string
+                description: Ссылка на фотографию врача-куратора
+              phone:
+                type: string
+                description: Телефон врача-куратора
+      types_of_insurance:
+        type: array
+        description: |
+          Перечень видов страхования, для которых хотя бы у одного продукта в
+          справочнике есть признак "Возможна покупка онлайн".
+        items:
+          type: object
+          properties:
+            title:
+              type: string
+              description: Название вида страхования
+            id:
+              type: string
+              description: Идентификатор вида страхования
+        minItems: 0
+      policies:
+        type: object
+        description: Все договоры
+        properties:
+          total:
+            type: integer
+            minimum: 0
+            description: Общее количество договоров
+      insurance_cases:
+        type: object
+        description: Страховые случаи
+        properties:
+          notifications_count:
+            type: integer
+            minimum: 0
+            description: Количество новых уведомлений по страховым случаям
+      inquiries:
+        type: object
+        description: Обращения
+        properties:
+          new_count:
+            type: integer
+            minimum: 0
+            description: Количество новых сообщений
+      payments:
+        type: object
+        description: Платежи
+        properties:
+          policies_count:
+            type: integer
+            minimum: 0
+            description: Количество договоров, требующих внимания
+  Message:
+    type: object
+    properties:
+      id:
+        type: string
+        description: ID сообщения
+      initial_message_id:
+        type: string
+        description: ID сообщения, с которого началась переписка по данной теме
+      from:
+        $ref: '#/definitions/Person'
+      to:
+        $ref: '#/definitions/Person'
+      date:
+        type: string
+        format: date-time
+        description: Дата и время отправки сообщения
+      unread_flag:
+        type: boolean
+        description: Флаг прочитанности/непрочитанности сообщения
+      subject:
+        type: string
+        description: Тема сообщения
+      message_text:
+        type: string
+        description: Текст сообщения
+  NewsArticle:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date
+        description: Дата
+      title:
+        type: string
+        description: Заголовок
+      preview:
+        type: string
+        description: Анонс новости
+      fulltext:
+        type: string
+        description: Текст новости
+      image_url:
+        type: string
+        description: Ссылка на иллюстрацию
+  Person:
+    type: object
+    properties:
+      first_name_rus:
+        type:  string
+        description: Имя, русское написание
+      surname_rus:
+        type:  string
+        description: Фамилия, русское написание
+      middle_name_rus:
+        type:  string
+        description: Отчество, русское написание
+      short_name_rus:
+        type:  string
+        description: Фамилия, инициалы
+      first_name_lat:
+        type:  string
+        description: Имя на латинице
+      surname_lat:
+        type:  string
+        description: Фамилия на латинице
+      birthdate:
+        type:  string
+        format: date
+        description: Дата рождения
+      emails:
+        type: array
+        description: Список адресов электронной почты
+        items:
+          type: string
+      phones:
+        type: array
+        description: Список телефонов
+        items:
+          type: string
+  Profile_ProfileOutput:
+    type: object
+    properties:
+      surname:
+        type: string
+        description: Фамилия
+      firstname:
+        type: string
+        description: Имя
+      middlename:
+        type: string
+        description: Отчество
+      birthdate:
+        type: string
+        format: date
+        description: Дата рождения
+      gender:
+        type: string
+        description: Пол
+        enum:
+          - Male
+          - Female
+          - Unknown
+      confirmed:
+        type: boolean
+        description: Статус прохождения процедуры подтверждения личности
+      phones:
+        type: array
+        description: Телефоны
+        items:
+          type: object
+          properties:
+            phone:
+              type: string
+            verified:
+              type: boolean
+        uniqueItems: true
+      email:
+        type: array
+        description: Электронные почтовые адреса
+        items:
+          type: object
+          properties:
+            email:
+              type: string
+            verified:
+              type: boolean
+        uniqueItems: true
+    required:
+      - surname
+      - firstname
+      - birthdate
+  Profile_ManageContact:
+    type: object
+    properties:
+      contact:
+        type: string
+        description: Номер телефона или адрес электронной почты
+      code:
+        type: integer
+        description: Код подтверждения
+    required:
+      - contact
+  Profile_ChangePassword:
+    type: object
+    properties:
+      password:
+        type: string
+        format: password
+        description: Текущий пароль
+      new_password:
+        type: string
+        format: password
+        description: Новый пароль
+      new_password_again:
+        type: string
+        format: password
+        description: Повтор нового пароля
+    required:
+      - password
+      - new_password
+      - new_password_again
+  Profile_GetSettings:
+    type: object
+    properties:
+      two_factor_authentication:
+        type: boolean
+        description: Двухфакторная аутентификация
+      verified_phones:
+        type: array
+        description: Список подтвержденных телефонов
+        items:
+          type: string
+      auto_logout_time:
+        type: integer
+        description: Автоматический выход через * минут
+      notify_insurance_expiration:
+        type: boolean
+        description: Флаг уведомления об истечении периода страхования
+    required:
+      - two_factor_authentication

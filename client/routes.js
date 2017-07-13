@@ -10,11 +10,13 @@ import News from './components/News';
 import FAQ from './components/FAQ';
 import Contacts from './components/Contacts';
 import Error from './components/Error';
+import SignupContainer from './components/Forms/signup/SignupContainer';
 
-import {Route} from 'react-router';
+import {Route, IndexRoute} from 'react-router';
 
 export const routes = (
     <Route path='/' component={Main}>
+        <IndexRoute component={SignupContainer}/>
         <Route path='/services' component={Services}/>
         <Route path='/dispans' component={Dispans}/>
         <Route path='/hospital' component={Hostpital}/>
