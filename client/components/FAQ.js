@@ -11,7 +11,7 @@ export default class FAQ extends React.Component {
     render() {
         return (
             <div className="container">
-                <h1>ЧАВО</h1>
+                <h2>ЧАВО</h2>
             </div>
         );
     }

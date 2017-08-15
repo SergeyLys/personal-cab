@@ -1,5 +1,5 @@
 import React from 'react';
-import Main from './components/Main';
+import Main from './components/Main/Main';
 import Hostpital from './components/Hospital';
 import Services from './components/Services';
 import Dispans from './components/Dispans';
@@ -13,6 +13,10 @@ import Error from './components/Error';
 import SignupContainer from './components/Forms/signup/SignupContainer';
 
 import {Route, IndexRoute} from 'react-router';
+
+function checkLogin() {
+    console.log('check login');
+}
 
 export const routes = (
     <Route path='/' component={Main}>

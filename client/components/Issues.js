@@ -12,7 +12,7 @@ export default class Issues extends React.Component {
     render() {
         return (
             <div className="container">
-                <h1>Обращения</h1>
+                <h2>Обращения</h2>
             </div>
         );
     }

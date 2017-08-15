@@ -1,13 +1,13 @@
+import "./foundation-sites/scss/settings/_settings.scss";
+import "./foundation-sites/scss/foundation.scss";
+import './global.scss';
+
 import React from 'react';
-import Navigation from './Navigation/Navigation';
-import Header from './header/header';
-import Footer from './footer/footer';
+import Navigation from '../Navigation/Navigation';
+import Header from '../header/header';
+import Footer from '../footer/footer';
 
 export default class Main extends React.Component {
-
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         return (

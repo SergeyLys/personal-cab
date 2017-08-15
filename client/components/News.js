@@ -11,7 +11,7 @@ export default class News extends React.Component {
     render() {
         return (
             <div className="container">
-                <h1>Новости</h1>
+                <h2>Новости</h2>
             </div>
         );
     }

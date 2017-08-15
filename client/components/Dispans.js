@@ -12,7 +12,7 @@ export default class Dispans extends React.Component {
     render() {
         return (
             <div className="container">
-                <h1>Диспансеризация</h1>
+                <h2>Диспансеризация</h2>
             </div>
         );
     }

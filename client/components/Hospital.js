@@ -12,7 +12,7 @@ export default class Hospital extends React.Component {
     render() {
         return (
             <div className="container">
-                <h1>Госпитализация</h1>
+                <h2>Госпитализация</h2>
             </div>
         );
     }

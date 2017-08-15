@@ -16,9 +16,9 @@ export default class Header extends React.Component {
                         <div className="small-12 columns">
                             <div className="desctop-visible">
                                 <p>
-                                    <a href="tel:88001004440">8 800 100-44-40</a>
+                                    <a href="tel:88001004440">8 800 100-44-40 </a>
                                     справочная служба (бесплатно, круглосуточно)
-                                    <a href="#">заказать обратный звонок</a>
+                                    <a href="#"> заказать обратный звонок</a>
                                 </p>
 
                                 <ul className="top-nav">

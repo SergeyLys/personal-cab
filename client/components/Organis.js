@@ -11,7 +11,7 @@ export default class Organis extends React.Component {
     render() {
         return (
             <div className="container">
-                <h1>Медицинские организации</h1>
+                <h2>Медицинские организации</h2>
             </div>
         );
     }

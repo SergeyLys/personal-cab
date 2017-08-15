@@ -12,7 +12,7 @@ export default class Addons extends React.Component {
     render() {
         return (
             <div className="container">
-                <h1>Дополнительные услуги</h1>
+                <h2>Дополнительные услуги</h2>
             </div>
         );
     }

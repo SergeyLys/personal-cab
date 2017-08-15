@@ -11,7 +11,7 @@ export default class Contacts extends React.Component {
     render() {
         return (
             <div className="container">
-                <h1>Офисы и представительства</h1>
+                <h2>Офисы и представительства</h2>
             </div>
         );
     }

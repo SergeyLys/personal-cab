@@ -4,7 +4,9 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 import rootReducer from './reducers/rootReducer';
-import AppContainer from './containers/AppContainer';
+
+import { routes } from './routes';
+import {Router, browserHistory} from 'react-router';
 
 const store = createStore(
     rootReducer,
@@ -16,7 +18,7 @@ const store = createStore(
 
 ReactDOM.render(
     <Provider store={store}>
-        <AppContainer />
+        <Router history={browserHistory} routes={routes} />
     </Provider>,
     document.getElementById('root')
 );
