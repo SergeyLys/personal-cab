@@ -1,5 +1,6 @@
 import React from 'react';
 import Main from './components/Main/Main';
+import Personal from './components/Personal';
 import Hostpital from './components/Hospital';
 import Services from './components/Services';
 import Dispans from './components/Dispans';
@@ -10,17 +11,23 @@ import News from './components/News';
 import FAQ from './components/FAQ';
 import Contacts from './components/Contacts';
 import Error from './components/Error';
+import SigninContainer from './components/Forms/signin/SigninContainer';
 import SignupContainer from './components/Forms/signup/SignupContainer';
+import checkLogin from './common/checkLogin';
 
-import {Route, IndexRoute} from 'react-router';
+import {Route, IndexRoute, browserHistory} from 'react-router';
 
-function checkLogin() {
-    console.log('check login');
+function changeRoute() {
+    if (checkLogin) {
+        browserHistory['replace']('/signin');
+    }
 }
 
 export const routes = (
     <Route path='/' component={Main}>
-        <IndexRoute component={SignupContainer}/>
+        <IndexRoute onEnter={changeRoute} component={Personal}/>
+        <Route path='/signup' component={SignupContainer}/>
+        <Route path='/signin' component={SigninContainer}/>
         <Route path='/services' component={Services}/>
         <Route path='/dispans' component={Dispans}/>
         <Route path='/hospital' component={Hostpital}/>

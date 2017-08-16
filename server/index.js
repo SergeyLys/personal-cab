@@ -14,8 +14,11 @@ import webpackConfig from '../webpack.config';
 
 import config from './config/index';
 import authRouter from './routes/auth';
+import userRouter from './routes/user';
 
 import errorHandler from './middlewares/errorHandler';
+import checkToken from './middlewares/checkToken';
+import getUser from './middlewares/getUser';
 
 const app = express();
 const compiler = webpack(webpackConfig);
@@ -30,6 +33,7 @@ mongoose.connect(config.database, err => {
     console.log('mongo connected');
 });
 
+app.use(morgan('tiny'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
@@ -43,7 +47,8 @@ app.use(session({
 
 app.use(cors({origin: '*'}));
 app.use('/api', authRouter);
-
+app.use('/api', checkToken, userRouter);
+// app.use(getUser);
 
 app.use(webpackMiddleware(compiler, {
     hot: true,

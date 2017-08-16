@@ -11,8 +11,6 @@ export default class SignupForm extends React.Component {
     state = {
         username: '',
         password: '',
-        location: '',
-        terms: false,
         errors: {}
     };
 
@@ -31,25 +29,15 @@ export default class SignupForm extends React.Component {
 
         if (this.isValid()) {
             this.setState({ errors: {} });
-            this.props.userSignupRequest(this.state).then(
-                () => {
-
-                },
-                ({data}) => this.setState({ errors: data })
-            )
+            this.props.userSignupRequest(this.state);
         }
 
     }
 
     onChange(e) {
-        if (e.target.name === 'terms') {
-            // e.target.c
-            console.log(e.target);
-        } else {
-            this.setState({
-                [e.target.name]: e.target.value
-            });
-        }
+        this.setState({
+            [e.target.name]: e.target.value
+        });
     }
 
     render() {
@@ -57,7 +45,7 @@ export default class SignupForm extends React.Component {
 
         return (
             <div className="row align-center">
-                <div className="small-12 medium-6 column">
+                <div className="small-12 medium-8 column">
                     <h1>Регистрация личного кабинета</h1>
                     <p>Если вы уже зарегистрированы, <Link to='/signin'>войдите</Link> в личный кабинет или воспользуйтесь процедурой
                         <Link to='/access-recovery'>восстановления доступа</Link>, если не помните свой пароль. Повторная регистрация одного и того же лица не допускается. Поля, обозначенные звездочками, обязательны для заполнения.</p>
@@ -83,24 +71,26 @@ export default class SignupForm extends React.Component {
                             />
                             {errors.password ? <span className="error">{errors.password}</span> : ''}
                         </div>
-                        <div className={classnames("input-row", {'has-error': errors.location})}>
-                            <label htmlFor="">Регион <span>*</span>:</label>
-                            <select
-                                name="location"
-                                value={this.state.location}
-                                onChange={::this.onChange}
-                            >
-                                <option value="" disabled></option>
-                                <option value="1">Тест</option>
-                            </select>
-                            {errors.location ? <span className="error">{errors.location}</span> : ''}
+                        {/*<div className={classnames("input-row", {'has-error': errors.location})}>*/}
+                            {/*<label htmlFor="">Регион <span>*</span>:</label>*/}
+                            {/*<select*/}
+                                {/*name="location"*/}
+                                {/*value={this.state.location}*/}
+                                {/*onChange={::this.onChange}*/}
+                            {/*>*/}
+                                {/*<option value="" disabled></option>*/}
+                                {/*<option value="1">Тест</option>*/}
+                            {/*</select>*/}
+                            {/*{errors.location ? <span className="error">{errors.location}</span> : ''}*/}
+                        {/*</div>*/}
+                        <div className="input-row">
+                            <button className="button">Зарегистрироваться</button>
                         </div>
-                        <button className="button">Зарегистрироваться</button>
                     </form>
 
                     <div className="bottom-actions">
-                        <Link to='/signin'>Вход в систему</Link>
-                        <Link to='/access-recovery'>Восстановление доступа</Link>
+                        <Link to='/signin'>Вход в систему </Link>
+                        <Link to='/access-recovery'>Восстановление доступа </Link>
                     </div>
                 </div>
             </div>
