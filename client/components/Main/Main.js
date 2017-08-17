@@ -4,13 +4,13 @@ import './global.scss';
 
 import React from 'react';
 import Navigation from '../Navigation/Navigation';
-import Header from '../header/header';
+import HeaderContainer from '../header/HeaderContainer';
 import Footer from '../footer/footer';
 import checkLogin from '../../common/checkLogin';
 
 export default class Main extends React.Component {
     render() {
-        if (checkLogin) {
+        if (typeof checkLogin('token') == 'undefined') {
             return (
                 <div className="site-wrapper">
 
@@ -29,7 +29,7 @@ export default class Main extends React.Component {
         } else {
             return (
                 <div className="site-wrapper">
-                    <Header />
+                    <HeaderContainer />
 
                     <main className="site-main">
                         <div className="row align-center">

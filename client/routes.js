@@ -18,7 +18,7 @@ import checkLogin from './common/checkLogin';
 import {Route, IndexRoute, browserHistory} from 'react-router';
 
 function changeRoute() {
-    if (checkLogin) {
+    if (typeof checkLogin('token') == 'undefined') {
         browserHistory['replace']('/signin');
     }
 }
@@ -28,16 +28,16 @@ export const routes = (
         <IndexRoute onEnter={changeRoute} component={Personal}/>
         <Route path='/signup' component={SignupContainer}/>
         <Route path='/signin' component={SigninContainer}/>
-        <Route path='/services' component={Services}/>
-        <Route path='/dispans' component={Dispans}/>
-        <Route path='/hospital' component={Hostpital}/>
-        <Route path='/issues' component={Issues}/>
-        <Route path='/organisations' component={Organis}/>
-        <Route path='/addons' component={Addons}/>
-        <Route path='/news' component={News}/>
-        <Route path='/faq' component={FAQ}/>
-        <Route path='/contacts' component={Contacts}/>
-        <Route path='*' component={Error}/>
+        <Route onEnter={changeRoute} path='/services' component={Services}/>
+        <Route onEnter={changeRoute} path='/dispans' component={Dispans}/>
+        <Route onEnter={changeRoute} path='/hospital' component={Hostpital}/>
+        <Route onEnter={changeRoute} path='/issues' component={Issues}/>
+        <Route onEnter={changeRoute} path='/organisations' component={Organis}/>
+        <Route onEnter={changeRoute} path='/addons' component={Addons}/>
+        <Route onEnter={changeRoute} path='/news' component={News}/>
+        <Route onEnter={changeRoute} path='/faq' component={FAQ}/>
+        <Route onEnter={changeRoute} path='/contacts' component={Contacts}/>
+        <Route onEnter={changeRoute} path='*' component={Error}/>
     </Route>
 );
 

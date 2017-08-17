@@ -1,6 +1,9 @@
 
-export default function checkLogin() {
-    if (window.localStorage.getItem('token') == null) {
-        return true;
-    }
+export default function checkLogin(token) {
+
+    var matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + token.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+
 }

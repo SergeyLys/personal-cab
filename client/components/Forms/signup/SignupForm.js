@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import classnames from 'classnames';
 import validateInput from '../../../common/validateInput';
+import { browserHistory } from 'react-router';
 
 export default class SignupForm extends React.Component {
     constructor() {
@@ -9,7 +10,7 @@ export default class SignupForm extends React.Component {
     }
 
     state = {
-        username: '',
+        login: '',
         password: '',
         errors: {}
     };
@@ -29,7 +30,11 @@ export default class SignupForm extends React.Component {
 
         if (this.isValid()) {
             this.setState({ errors: {} });
-            this.props.userSignupRequest(this.state);
+            this.props.userSignupRequest(this.state).then((data)=>{
+                if (data.status === 200) {
+                    browserHistory['replace']('/signin');
+                }
+            });
         }
 
     }
@@ -51,15 +56,15 @@ export default class SignupForm extends React.Component {
                         <Link to='/access-recovery'>восстановления доступа</Link>, если не помните свой пароль. Повторная регистрация одного и того же лица не допускается. Поля, обозначенные звездочками, обязательны для заполнения.</p>
 
                     <form action="#" onSubmit={::this.onSubmit}>
-                        <div className={classnames("input-row", {'has-error': errors.username})}>
+                        <div className={classnames("input-row", {'has-error': errors.login})}>
                             <label>Мобильный телефон или электронная почта <span>*</span>:</label>
                             <input
                                 type="text"
-                                name="username"
-                                value={this.state.username}
+                                name="login"
+                                value={this.state.login}
                                 onChange={::this.onChange}
                             />
-                            {errors.username ? <span className="error">{errors.username}</span> : ''}
+                            {errors.login ? <span className="error">{errors.login}</span> : ''}
                         </div>
                         <div className={classnames("input-row", {'has-error': errors.password})}>
                             <label htmlFor="">Номер полиса ОМС или временного свидетельства <span>*</span>:</label>

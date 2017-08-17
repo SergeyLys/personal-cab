@@ -15,7 +15,6 @@ export const signup = async (req, res, next) => {
         })
     }
 
-
     res.json(user);
 };
 
@@ -26,7 +25,7 @@ export const signin = async (req, res, next) => {
 
     if (!user) {
         return next({
-            status: 400,
+            status: 401,
             message: 'User not found'
         });
     }

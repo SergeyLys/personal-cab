@@ -2,6 +2,6 @@ import axios from 'axios';
 
 export function userSignupRequest(data) {
     return dispatch => {
-        return console.log(data)
+        return axios.post('http://localhost:8000/api/signup', data);
     }
 }
