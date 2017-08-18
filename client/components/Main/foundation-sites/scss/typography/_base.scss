@@ -40,7 +40,7 @@ $font-family-monospace: Consolas, 'Liberation Mono', Courier, monospace !default
 
 /// Color of headers.
 /// @type Color
-$header-color: inherit !default;
+$header-color: $blue !default;
 
 /// Line height of headers.
 /// @type Number

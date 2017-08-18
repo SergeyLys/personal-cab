@@ -7,7 +7,8 @@ import Dispans from './components/Dispans';
 import Organis from './components/Organis';
 import Issues from './components/Issues';
 import Addons from './components/Addons';
-import News from './components/News';
+import NewsContainer from './components/News/NewsContainer';
+import NewsIndex from './components/News/NewsIndex';
 import FAQ from './components/FAQ';
 import Contacts from './components/Contacts';
 import Error from './components/Error';
@@ -23,18 +24,25 @@ function changeRoute() {
     }
 }
 
+function preventEnter() {
+    if (typeof checkLogin('token') != 'undefined') {
+        browserHistory['replace']('/');
+    }
+}
+
 export const routes = (
     <Route path='/' component={Main}>
         <IndexRoute onEnter={changeRoute} component={Personal}/>
-        <Route path='/signup' component={SignupContainer}/>
-        <Route path='/signin' component={SigninContainer}/>
+        <Route onEnter={preventEnter} path='/signup' component={SignupContainer}/>
+        <Route onEnter={preventEnter} path='/signin' component={SigninContainer}/>
         <Route onEnter={changeRoute} path='/services' component={Services}/>
         <Route onEnter={changeRoute} path='/dispans' component={Dispans}/>
         <Route onEnter={changeRoute} path='/hospital' component={Hostpital}/>
         <Route onEnter={changeRoute} path='/issues' component={Issues}/>
         <Route onEnter={changeRoute} path='/organisations' component={Organis}/>
         <Route onEnter={changeRoute} path='/addons' component={Addons}/>
-        <Route onEnter={changeRoute} path='/news' component={News}/>
+        <Route onEnter={changeRoute} path='/news' component={NewsContainer}/>
+        <Route onEnter={changeRoute} path='/news/:url' component={NewsIndex}/>
         <Route onEnter={changeRoute} path='/faq' component={FAQ}/>
         <Route onEnter={changeRoute} path='/contacts' component={Contacts}/>
         <Route onEnter={changeRoute} path='*' component={Error}/>

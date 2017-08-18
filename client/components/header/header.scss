@@ -4,6 +4,7 @@
 
 .header-row-top {
   background-color: #cddeea;
+  margin-bottom: 50px;
 }
 
 .top-nav {
@@ -15,4 +16,10 @@
   li {
     margin-right: 15px;
   }
+}
+
+.header-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }

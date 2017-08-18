@@ -32,23 +32,25 @@ export default class Header extends React.Component {
                 <div className="header-row-top">
                     <div className="row">
                         <div className="small-12 columns">
-                            <div className="desctop-visible">
-                                <p>
-                                    <a href="tel:88001004440">8 800 100-44-40 </a>
-                                    справочная служба (бесплатно, круглосуточно)
-                                    <a href="#"> заказать обратный звонок</a>
-                                </p>
+                            <div className="header-line">
+                                <div className="desctop-visible">
+                                    <p>
+                                        <a href="tel:88001004440">8 800 100-44-40 </a>
+                                        справочная служба (бесплатно, круглосуточно)
+                                        <a href="#"> заказать обратный звонок</a>
+                                    </p>
 
-                                <ul className="top-nav">
-                                    <li><Link to="/contacts">Офисы и представительства</Link></li>
-                                    <li><Link to="/news">Новости</Link></li>
-                                    <li><Link to="/faq">Частые вопросы</Link></li>
-                                </ul>
+                                    <ul className="top-nav">
+                                        <li><Link to="/contacts">Офисы и представительства</Link></li>
+                                        <li><Link to="/news">Новости</Link></li>
+                                        <li><Link to="/faq">Частые вопросы</Link></li>
+                                    </ul>
 
-                            </div>
-                            <div className="user-controls">
-                                <p>{this.state.username}</p>
-                                <a href="#" onClick={::this.quiteHandler}>Выйти</a>
+                                </div>
+                                <div className="user-controls">
+                                    <p><Link to="/">{this.state.username}</Link></p>
+                                    <a href="#" onClick={::this.quiteHandler}>Выйти</a>
+                                </div>
                             </div>
                         </div>
                     </div>

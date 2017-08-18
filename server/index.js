@@ -15,6 +15,7 @@ import webpackConfig from '../webpack.config';
 import config from './config/index';
 import authRouter from './routes/auth';
 import userRouter from './routes/user';
+import newsRouter from './routes/news';
 
 import errorHandler from './middlewares/errorHandler';
 import checkToken from './middlewares/checkToken';
@@ -48,6 +49,7 @@ app.use(session({
 app.use(cors({origin: '*'}));
 app.use('/api', authRouter);
 app.use('/api', checkToken, userRouter);
+app.use('/api', checkToken, newsRouter);
 // app.use(getUser);
 
 app.use(webpackMiddleware(compiler, {
@@ -57,7 +59,7 @@ app.use(webpackMiddleware(compiler, {
 }));
 app.use(webpackHotMiddleware(compiler));
 
-app.get('/*', (req, res) => {
+app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 

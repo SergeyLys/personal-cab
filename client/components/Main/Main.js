@@ -1,5 +1,5 @@
-import "./foundation-sites/scss/settings/_settings.scss";
 import "./foundation-sites/scss/foundation.scss";
+import "./foundation-sites/scss/settings/_settings.scss";
 import './global.scss';
 
 import React from 'react';

@@ -8,6 +8,7 @@ import rootReducer from './reducers/rootReducer';
 import { routes } from './routes';
 import {Router, browserHistory} from 'react-router';
 
+
 const store = createStore(
     rootReducer,
     compose(
