@@ -14,8 +14,6 @@ export async function getAll(req, res, next) {
         });
     }
 
-    console.log(news);
-
     res.json(news);
 }
 
@@ -28,8 +26,6 @@ export async function getOne(req, res, next) {
             message
         });
     }
-
-    console.log(req.url);
 
     res.json(newsItem);
 }

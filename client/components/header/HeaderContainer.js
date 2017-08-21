@@ -7,7 +7,7 @@ class HeaderContainer extends React.Component {
     render() {
         return (
             <div className="headerContainer">
-                <Header currentUserRequest={this.props.currentUserRequest}/>
+                <Header/>
             </div>
         )
     }

@@ -1,5 +1,5 @@
 import React from 'react';
-import Main from './components/Main/Main';
+import MainContainer from './components/Main/MainContainer';
 import Personal from './components/Personal';
 import Hostpital from './components/Hospital';
 import Services from './components/Services';
@@ -8,7 +8,7 @@ import Organis from './components/Organis';
 import Issues from './components/Issues';
 import Addons from './components/Addons';
 import NewsContainer from './components/News/NewsContainer';
-import NewsIndex from './components/News/NewsIndex';
+import NewsIndexContainer from './components/News/NewsIndexContainer';
 import FAQ from './components/FAQ';
 import Contacts from './components/Contacts';
 import Error from './components/Error';
@@ -31,7 +31,7 @@ function preventEnter() {
 }
 
 export const routes = (
-    <Route path='/' component={Main}>
+    <Route path='/' component={MainContainer}>
         <IndexRoute onEnter={changeRoute} component={Personal}/>
         <Route onEnter={preventEnter} path='/signup' component={SignupContainer}/>
         <Route onEnter={preventEnter} path='/signin' component={SigninContainer}/>
@@ -42,7 +42,7 @@ export const routes = (
         <Route onEnter={changeRoute} path='/organisations' component={Organis}/>
         <Route onEnter={changeRoute} path='/addons' component={Addons}/>
         <Route onEnter={changeRoute} path='/news' component={NewsContainer}/>
-        <Route onEnter={changeRoute} path='/news/:url' component={NewsIndex}/>
+        <Route onEnter={changeRoute} path='/news/:url' component={NewsIndexContainer}/>
         <Route onEnter={changeRoute} path='/faq' component={FAQ}/>
         <Route onEnter={changeRoute} path='/contacts' component={Contacts}/>
         <Route onEnter={changeRoute} path='*' component={Error}/>

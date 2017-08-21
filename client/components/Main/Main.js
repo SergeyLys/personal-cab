@@ -4,13 +4,13 @@ import './global.scss';
 
 import React from 'react';
 import Navigation from '../Navigation/Navigation';
-import HeaderContainer from '../header/HeaderContainer';
+import Header from '../header/Header';
 import Footer from '../footer/footer';
-import checkLogin from '../../common/checkLogin';
 
 export default class Main extends React.Component {
+
     render() {
-        if (typeof checkLogin('token') == 'undefined') {
+        if (this.props.currentUser == '') {
             return (
                 <div className="site-wrapper">
 
@@ -29,7 +29,7 @@ export default class Main extends React.Component {
         } else {
             return (
                 <div className="site-wrapper">
-                    <HeaderContainer />
+                    <Header currentUser={this.props.currentUser} onSignOut={this.props.onSignOut} />
 
                     <main className="site-main">
                         <div className="row align-center">

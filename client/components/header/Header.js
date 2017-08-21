@@ -1,26 +1,12 @@
 import React from 'react';
 import { Link, browserHistory } from 'react-router';
 import './header.scss';
-import checkLogin from '../../common/checkLogin';
 
 export default class Header extends React.Component {
 
-    state = {
-        username: ''
-    };
-
-    componentDidMount() {
-        this.props.currentUserRequest(checkLogin('token'))
-            .then(response => {
-                this.setState({username: response.data.login});
-            }).catch(err => {
-                console.log(err);
-        });
-    }
-
     quiteHandler(e) {
         e.preventDefault();
-        this.setState({username: ''});
+        this.props.onSignOut();
         document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
         browserHistory['replace']('/signin');
     }
@@ -48,7 +34,7 @@ export default class Header extends React.Component {
 
                                 </div>
                                 <div className="user-controls">
-                                    <p><Link to="/">{this.state.username}</Link></p>
+                                    <p><Link to="/">{this.props.currentUser}</Link></p>
                                     <a href="#" onClick={::this.quiteHandler}>Выйти</a>
                                 </div>
                             </div>

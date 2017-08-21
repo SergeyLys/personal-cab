@@ -17,8 +17,7 @@ export function newsItemRequest(token, url) {
                 let newsItemArray = Array.prototype.map.call(response.data, (value, index)=> {
                     return [value];
                 });
-                console.log('DATA',newsItemArray, response.data)
-                dispatch({ type: 'FETCH_NEWS_ITEM', payload: newsItemArray })
+                dispatch({ type: 'FETCH_NEWS_ITEM', payload: response.data })
             });
     }
 }
