@@ -6,7 +6,7 @@ import Services from './components/Services';
 import Dispans from './components/Dispans';
 import Organis from './components/Organis';
 import Issues from './components/Issues';
-import Addons from './components/Addons/Addons';
+import AddonsContainer from './components/Addons/AddonsContainer';
 import NewsContainer from './components/News/NewsContainer';
 import NewsIndexContainer from './components/News/NewsIndexContainer';
 import FAQ from './components/FAQ';
@@ -40,7 +40,7 @@ export const routes = (
         <Route onEnter={changeRoute} path='/hospital' component={Hostpital}/>
         <Route onEnter={changeRoute} path='/issues' component={Issues}/>
         <Route onEnter={changeRoute} path='/organisations' component={Organis}/>
-        <Route onEnter={changeRoute} path='/addons' component={Addons}/>
+        <Route onEnter={changeRoute} path='/addons' component={AddonsContainer}/>
         <Route onEnter={changeRoute} path='/news' component={NewsContainer}/>
         <Route onEnter={changeRoute} path='/news/:url' component={NewsIndexContainer}/>
         <Route onEnter={changeRoute} path='/faq' component={FAQ}/>

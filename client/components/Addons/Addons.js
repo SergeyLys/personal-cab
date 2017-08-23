@@ -1,27 +1,25 @@
 /*Дополнительные услуги*/
 
 import React from 'react';
-import { connect } from 'react-redux';
-import { addonsListRequest } from '../../actions/addonsRequest';
-import checkLogin from '../../common/checkLogin';
 
-class Addons extends React.Component {
 
-    constructor(props) {
-        super(props);
-    }
-
-    componentDidMount() {
-        this.props.addonsListRequest(checkLogin('token'));
-    }
+export default class Addons extends React.Component {
 
     render() {
+        const addon = !this.props.addons.addons ? null : this.props.addons.addons.map((item, index) => {
+            return (
+                <div key={index} className="addons-list-item">
+                    <img src={item.image_url} alt="image"/>
+                    <h5>{item.title}</h5>
+                </div>
+            )
+        });
+
         return (
             <div className="container">
-                <h2>Дополнительные услуги</h2>
+                {addon}
             </div>
         );
     }
 }
 
-export default connect(null, {addonsListRequest})(Addons);
