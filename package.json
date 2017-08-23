@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "JavaScript kit",
   "scripts": {
-    "start": "nodemon --watch server --exec babel-node -- server/index.js",
-    "webpack-devserver": "webpack-dev-server --debug --hot --devtool eval-source-map --output-pathinfo --watch --colors --inline --content-base public --port 8090 --host 0.0.0.0"
+    "start": "NODE_ENV=development nodemon --watch server --exec babel-node -- server/index.js",
+    "build": "NODE_ENV=production nodemon --watch server --exec babel-node -- server/index.js"
   },
   "author": {
     "name": "cox",
@@ -21,6 +21,7 @@
     "classnames": "^2.2.5",
     "cors": "*",
     "express": "*",
+    "express-breadcrumbs": "0.0.2",
     "express-session": "^1.15.5",
     "foundation-sites": "^6.4.1",
     "jsonwebtoken": "^7.4.2",
@@ -36,6 +37,7 @@
     "react-redux": "latest",
     "react-router": "^3.0.5",
     "redux": "latest",
+    "redux-breadcrumb-trail": "^0.5.0",
     "redux-thunk": "^2.1.0",
     "shortid": "^2.2.6",
     "whatwg-fetch": "^2.0.3"

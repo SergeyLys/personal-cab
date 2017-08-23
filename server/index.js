@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import session from 'express-session';
 import morgan from 'morgan';
 import bluebird from 'bluebird';
+import breadcrumbs from 'express-breadcrumbs';
 
 import webpack from 'webpack';
 import webpackMiddleware from 'webpack-dev-middleware';
@@ -16,6 +17,7 @@ import config from './config/index';
 import authRouter from './routes/auth';
 import userRouter from './routes/user';
 import newsRouter from './routes/news';
+import addonsRouter from './routes/addons';
 
 import errorHandler from './middlewares/errorHandler';
 import checkToken from './middlewares/checkToken';
@@ -45,11 +47,13 @@ app.use(session({
     saveUninitialized: true,
     secret: config.secret
 }));
-
+app.use(breadcrumbs.init());
 app.use(cors({origin: '*'}));
+
 app.use('/api', authRouter);
 app.use('/api', checkToken, userRouter);
 app.use('/api', checkToken, newsRouter);
+app.use('/api', checkToken, addonsRouter);
 // app.use(getUser);
 
 app.use(webpackMiddleware(compiler, {

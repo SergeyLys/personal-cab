@@ -10,7 +10,7 @@ class NewsIndexContainer extends React.Component {
     }
 
     render() {
-
+        console.log(this);
         return (
             <NewsIndex news={this.props.newsItem}/>
         )

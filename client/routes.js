@@ -6,7 +6,7 @@ import Services from './components/Services';
 import Dispans from './components/Dispans';
 import Organis from './components/Organis';
 import Issues from './components/Issues';
-import Addons from './components/Addons';
+import Addons from './components/Addons/Addons';
 import NewsContainer from './components/News/NewsContainer';
 import NewsIndexContainer from './components/News/NewsIndexContainer';
 import FAQ from './components/FAQ';
